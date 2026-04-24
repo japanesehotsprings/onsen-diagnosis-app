@@ -9,14 +9,11 @@ type Props = {
 export default function OnsenResultCard({ data }: Props) {
   return (
     <>
-      {/* タイプバッジ */}
+      {/* タイプ表示 */}
       <div className="text-center mb-5">
         <p className="text-xs text-gray-500 mb-2">あなたの温泉スタイル</p>
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-onsen-dark text-onsen-white text-4xl font-bold shadow-lg mb-3">
-          {data.key}
-        </div>
-        <p className="text-lg font-bold text-onsen-dark">{data.name}</p>
-        <p className="text-sm text-onsen mt-1">{data.catchPhrase}</p>
+        <p className="text-2xl font-bold text-onsen-dark mb-1">{data.name}</p>
+        <p className="text-sm text-onsen">{data.catchPhrase}</p>
       </div>
 
       {/* 区切り */}
