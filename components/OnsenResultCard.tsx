@@ -4,16 +4,9 @@ import type { OnsenTypeData } from '@/lib/onsenData'
 
 type Props = {
   data: OnsenTypeData
-  shareUrl: string
 }
 
-export default function OnsenResultCard({ data, shareUrl }: Props) {
-  const xShareText = encodeURIComponent(
-    `私は「${data.name}」でした！\nおすすめ：${data.spots[0].name}・${data.spots[1].name}・${data.spots[2].name}\n`,
-  )
-  const xShareUrl = `https://twitter.com/intent/tweet?text=${xShareText}&url=${encodeURIComponent(shareUrl)}`
-  const lineShareUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}`
-
+export default function OnsenResultCard({ data }: Props) {
   return (
     <>
       {/* タイプバッジ */}
@@ -72,30 +65,6 @@ export default function OnsenResultCard({ data, shareUrl }: Props) {
             </div>
           </div>
         ))}
-      </div>
-
-      {/* SNSシェア */}
-      <div className="flex gap-3">
-        <a
-          href={xShareUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Xでシェアする（外部リンク）"
-          className="flex-1 text-center py-3 rounded-xl text-sm font-bold text-white active:scale-95 transition-all"
-          style={{ backgroundColor: '#000000' }}
-        >
-          𝕏 でシェア
-        </a>
-        <a
-          href={lineShareUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="LINEでシェアする（外部リンク）"
-          className="flex-1 text-center py-3 rounded-xl text-sm font-bold text-white active:scale-95 transition-all"
-          style={{ backgroundColor: '#06c755' }}
-        >
-          LINEでシェア
-        </a>
       </div>
     </>
   )

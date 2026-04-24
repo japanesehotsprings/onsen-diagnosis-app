@@ -5,7 +5,6 @@ import { ONSEN_DATA, VALID_TYPES } from '@/lib/onsenData'
 import type { OnsenType } from '@/lib/questions'
 import OnsenResultCard from '@/components/OnsenResultCard'
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
 const DEFAULT_TYPE: OnsenType = 'T'
 
 type Props = {
@@ -22,7 +21,6 @@ export default async function ResultPage({ searchParams }: Props) {
       : DEFAULT_TYPE
 
   const data = ONSEN_DATA[type]
-  const shareUrl = `${BASE_URL}/result?type=${type}`
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
@@ -35,7 +33,7 @@ export default async function ResultPage({ searchParams }: Props) {
 
         {/* 結果カード */}
         <div className="bg-onsen-white border border-t-0 border-onsen/20 rounded-b-2xl px-6 py-8 shadow-sm">
-          <OnsenResultCard data={data} shareUrl={shareUrl} />
+          <OnsenResultCard data={data} />
         </div>
       </div>
     </main>
