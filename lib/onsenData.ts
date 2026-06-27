@@ -134,12 +134,12 @@ export const ONSEN_DATA: Record<OnsenType, OnsenTypeData> = {
         articleUrl: process.env.NEXT_PUBLIC_ARTICLE_OKUNIKKO ?? '#',
       },
       {
-        name: 'ほったらかし温泉',
-        prefecture: '山梨県',
+        name: '白骨温泉',
+        prefecture: '長野県',
         tier: 2,
-        description: '富士山と甲府盆地を見下ろす絶景の露天風呂',
-        affiliateUrl: process.env.NEXT_PUBLIC_AFFILIATE_HOTTARAKASHI ?? '#',
-        articleUrl: process.env.NEXT_PUBLIC_ARTICLE_HOTTARAKASHI ?? '#',
+        description: '乳白色の湯と「泡の湯」で知られる山あいの秘湯',
+        affiliateUrl: process.env.NEXT_PUBLIC_AFFILIATE_SHIRAHONE ?? '#',
+        articleUrl: process.env.NEXT_PUBLIC_ARTICLE_SHIRAHONE ?? '#',
       },
       {
         name: '乳頭温泉郷',
