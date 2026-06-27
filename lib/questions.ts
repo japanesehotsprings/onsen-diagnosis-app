@@ -2,6 +2,9 @@
 
 export type OnsenType = 'T' | 'B' | 'S' | 'K'
 
+// 都内（東京）からの距離帯。1=近い 〜 4=最遠。診断結果の温泉地フィルタに使う。
+export type TravelTier = 1 | 2 | 3 | 4
+
 export type AnswerOption = {
   label: string
   type: OnsenType
@@ -14,6 +17,7 @@ export type Question = {
   options: AnswerOption[]
 }
 
+// 性格（温泉スタイル）を判定する6問。各回答は選んだタイプに加点される。
 export const QUESTIONS: Question[] = [
   {
     id: 1,
@@ -81,15 +85,29 @@ export const QUESTIONS: Question[] = [
       { label: '山奥のこぢんまりした宿。電波も届かない', type: 'S' },
     ],
   },
-  {
-    id: 7,
-    scenario: 'どのくらい遠くまで行ける？',
-    text: '旅の距離感で、向かえる温泉地が変わる。',
-    options: [
-      { label: '2〜4時間。少し遠くまで行ける', type: 'T' },
-      { label: '日帰りでも十分。サクッと行きたい', type: 'B' },
-      { label: '近場（2時間以内）でいい', type: 'K' },
-      { label: 'どこでもOK。遠ければ遠いほどいい', type: 'S' },
-    ],
-  },
 ]
+
+export type DistanceOption = {
+  label: string
+  tier: TravelTier
+}
+
+export type DistanceQuestion = {
+  id: number
+  scenario: string
+  text: string
+  options: DistanceOption[]
+}
+
+// 距離の質問（最終問）。性格スコアには加点せず、結果の温泉地を都内基準で絞り込むのに使う。
+export const DISTANCE_QUESTION: DistanceQuestion = {
+  id: 7,
+  scenario: 'どこまで行ける？',
+  text: '都内から、どのくらいの距離まで足を伸ばせますか？',
+  options: [
+    { label: '都内から2時間以内の近場でいい', tier: 1 },
+    { label: '2〜4時間まで。少し足を伸ばせる', tier: 2 },
+    { label: '泊まりでしっかり。半日かけてもいい', tier: 3 },
+    { label: 'どこでもOK。遠くても絶景なら行く', tier: 4 },
+  ],
+}
