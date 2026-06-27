@@ -1,11 +1,24 @@
 // app/page.tsx
 
+import Image from 'next/image'
 import Link from 'next/link'
 
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm">
+        {/* ロゴ */}
+        <div className="flex justify-center mb-5">
+          <Image
+            src="/logo.png"
+            alt="温泉診断"
+            width={120}
+            height={120}
+            priority
+            className="w-28 h-28 drop-shadow-sm"
+          />
+        </div>
+
         {/* ヘッダー */}
         <div className="bg-onsen-dark text-onsen-white rounded-t-2xl px-6 py-5 text-center">
           <p className="text-xs opacity-70 tracking-widest uppercase mb-1">日本温泉</p>
