@@ -27,10 +27,19 @@ describe('filterSpotsByTier', () => {
     expect(r.spots.map((s) => s.name)).toEqual(['A', 'B'])
   })
 
-  it('どこでもOK(tier4)は全件を近い順でlimitまで', () => {
+  it('どこでもOK(tier4)は近い〜遠いをバランス良く選び、両端を含む', () => {
     const r = filterSpotsByTier(spots, 4, 3)
-    expect(r.spots.map((s) => s.name)).toEqual(['A', 'B', 'C'])
     expect(r.isFallback).toBe(false)
+    expect(r.spots.length).toBe(3)
+    expect(r.spots[0].name).toBe('A') // 最寄りを含む
+    expect(r.spots[r.spots.length - 1].name).toBe('D') // 最遠を含む
+  })
+
+  it('候補が多くても最寄り帯と最遠帯の両方を含む', () => {
+    const set: OnsenSpot[] = [spot('a', 1), spot('b', 1), spot('c', 2), spot('d', 4), spot('e', 4)]
+    const r = filterSpotsByTier(set, 4, 3)
+    expect(r.spots[0].tier).toBe(1) // 最寄り帯
+    expect(r.spots[r.spots.length - 1].tier).toBe(4) // 最遠帯
   })
 
   it('該当タイプに近場が無ければisFallback=trueで最寄りから近い順に埋める', () => {

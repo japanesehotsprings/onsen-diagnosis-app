@@ -20,7 +20,22 @@ export function parseTier(raw?: string): TravelTier {
   return (VALID_TIERS as number[]).includes(n) ? (n as TravelTier) : 4
 }
 
-// 選んだ距離帯(maxTier)に収まるスポットを「都内から近い順」で返す。
+// 距離(tier)昇順ソート済みのスポットから limit 件を「近い〜遠いが偏らないよう」選ぶ。
+// 均等間隔で取るため両端（最寄り・最遠）を必ず含み、結果に距離のバランスが出る
+// （例: 「どこでもOK」で近場ばかり/遠方ばかりにならず、近・中・遠が混ざる）。
+function balancedPick(sorted: OnsenSpot[], limit: number): OnsenSpot[] {
+  if (limit <= 0) return []
+  if (sorted.length <= limit) return sorted
+  if (limit === 1) return [sorted[0]]
+  const picked: OnsenSpot[] = []
+  for (let i = 0; i < limit; i++) {
+    const idx = Math.round((i * (sorted.length - 1)) / (limit - 1))
+    picked.push(sorted[idx])
+  }
+  return picked
+}
+
+// 選んだ距離帯(maxTier)に収まるスポットを、近い〜遠いのバランスを取って返す。
 // 該当が1件も無ければ、最寄りのスポットから limit 件を埋め isFallback=true を返す
 // （例: 秘湯タイプ×都内近場のように、近場の候補が無いケースを誠実に扱う）。
 export function filterSpotsByTier(
@@ -31,7 +46,7 @@ export function filterSpotsByTier(
   const byTier = (a: OnsenSpot, b: OnsenSpot) => a.tier - b.tier
   const within = spots.filter((s) => s.tier <= maxTier).sort(byTier)
   if (within.length > 0) {
-    return { spots: within.slice(0, limit), isFallback: false }
+    return { spots: balancedPick(within, limit), isFallback: false }
   }
   const nearest = [...spots].sort(byTier).slice(0, limit)
   return { spots: nearest, isFallback: true }
