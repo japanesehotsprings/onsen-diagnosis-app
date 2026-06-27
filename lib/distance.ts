@@ -35,19 +35,25 @@ function balancedPick(sorted: OnsenSpot[], limit: number): OnsenSpot[] {
   return picked
 }
 
-// 選んだ距離帯(maxTier)に収まるスポットを、近い〜遠いのバランスを取って返す。
-// 該当が1件も無ければ、最寄りのスポットから limit 件を埋め isFallback=true を返す
-// （例: 秘湯タイプ×都内近場のように、近場の候補が無いケースを誠実に扱う）。
+// 選んだ距離帯(maxTier)を優先しつつ、常に limit 件を返す（「3選」と数を合わせる）。
+// - 距離内に limit 件以上 → 距離内を近い〜遠いバランスで limit 件
+// - 距離内が limit 未満 → 距離内を優先し、足りない分は「次に近い」温泉地で補完
+//   （最寄りから埋めるので、近場を選んで最遠が出ることはない）
+// - 距離内が0件 → 最寄りから limit 件で代替し isFallback=true（例: 秘湯×都内近場）
 export function filterSpotsByTier(
   spots: OnsenSpot[],
   maxTier: TravelTier,
   limit = 3,
 ): { spots: OnsenSpot[]; isFallback: boolean } {
   const byTier = (a: OnsenSpot, b: OnsenSpot) => a.tier - b.tier
-  const within = spots.filter((s) => s.tier <= maxTier).sort(byTier)
-  if (within.length > 0) {
+  const sorted = [...spots].sort(byTier)
+  const within = sorted.filter((s) => s.tier <= maxTier)
+  if (within.length >= limit) {
     return { spots: balancedPick(within, limit), isFallback: false }
   }
-  const nearest = [...spots].sort(byTier).slice(0, limit)
-  return { spots: nearest, isFallback: true }
+  if (within.length === 0) {
+    return { spots: sorted.slice(0, limit), isFallback: true }
+  }
+  const beyond = sorted.filter((s) => s.tier > maxTier)
+  return { spots: [...within, ...beyond].slice(0, limit), isFallback: false }
 }

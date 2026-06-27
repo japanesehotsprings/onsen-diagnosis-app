@@ -13,47 +13,45 @@ const spot = (name: string, tier: TravelTier): OnsenSpot => ({
   articleUrl: '#',
 })
 
-const spots: OnsenSpot[] = [spot('A', 1), spot('B', 2), spot('C', 4), spot('D', 4)]
-
 describe('filterSpotsByTier', () => {
-  it('都内近場(tier1)を選ぶとtier1のスポットだけ・isFallback=false', () => {
-    const r = filterSpotsByTier(spots, 1)
+  it('距離内に十分あれば、距離内のみをバランス良く返す（遠方は出ない）', () => {
+    const s: OnsenSpot[] = [spot('A', 1), spot('B', 1), spot('C', 1), spot('D', 4)]
+    const r = filterSpotsByTier(s, 1)
     expect(r.isFallback).toBe(false)
-    expect(r.spots.map((s) => s.name)).toEqual(['A'])
+    expect(r.spots.map((x) => x.name).sort()).toEqual(['A', 'B', 'C'])
+    expect(r.spots.every((x) => x.tier <= 1)).toBe(true) // 最遠Dは出ない
   })
 
-  it('tier2はtier1とtier2を近い順で含む', () => {
-    const r = filterSpotsByTier(spots, 2)
-    expect(r.spots.map((s) => s.name)).toEqual(['A', 'B'])
+  it('距離内が3件未満なら「次に近い」温泉で3件まで補完する', () => {
+    const s: OnsenSpot[] = [spot('A', 1), spot('B', 2), spot('C', 4), spot('D', 4)]
+    const r = filterSpotsByTier(s, 1)
+    expect(r.isFallback).toBe(false)
+    expect(r.spots.length).toBe(3)
+    expect(r.spots[0].name).toBe('A') // 最寄りを最優先
+    expect(r.spots.map((x) => x.name)).toEqual(['A', 'B', 'C']) // 近い順で補完・最遠Dは出ない
+  })
+
+  it('総数が3未満なら、ある分だけ返す', () => {
+    const s: OnsenSpot[] = [spot('A', 1), spot('B', 4)]
+    const r = filterSpotsByTier(s, 1)
+    expect(r.spots.length).toBe(2)
   })
 
   it('どこでもOK(tier4)は近い〜遠いをバランス良く選び、両端を含む', () => {
-    const r = filterSpotsByTier(spots, 4, 3)
+    const s: OnsenSpot[] = [spot('A', 1), spot('B', 2), spot('C', 4), spot('D', 4)]
+    const r = filterSpotsByTier(s, 4, 3)
     expect(r.isFallback).toBe(false)
     expect(r.spots.length).toBe(3)
     expect(r.spots[0].name).toBe('A') // 最寄りを含む
     expect(r.spots[r.spots.length - 1].name).toBe('D') // 最遠を含む
   })
 
-  it('候補が多くても最寄り帯と最遠帯の両方を含む', () => {
-    const set: OnsenSpot[] = [spot('a', 1), spot('b', 1), spot('c', 2), spot('d', 4), spot('e', 4)]
-    const r = filterSpotsByTier(set, 4, 3)
-    expect(r.spots[0].tier).toBe(1) // 最寄り帯
-    expect(r.spots[r.spots.length - 1].tier).toBe(4) // 最遠帯
-  })
-
-  it('該当タイプに近場が無ければisFallback=trueで最寄りから近い順に埋める', () => {
-    const farOnly: OnsenSpot[] = [spot('E', 2), spot('F', 4)]
-    const r = filterSpotsByTier(farOnly, 1)
+  it('距離内に候補が無ければ isFallback=true で最寄りから3件返す', () => {
+    const s: OnsenSpot[] = [spot('E', 2), spot('F', 4), spot('G', 4)]
+    const r = filterSpotsByTier(s, 1)
     expect(r.isFallback).toBe(true)
-    expect(r.spots.map((s) => s.name)).toEqual(['E', 'F']) // 最寄りから limit まで
-  })
-
-  it('fallback時も limit を超えない', () => {
-    const farOnly: OnsenSpot[] = [spot('E', 3), spot('F', 4), spot('G', 4), spot('H', 4)]
-    const r = filterSpotsByTier(farOnly, 1, 2)
-    expect(r.isFallback).toBe(true)
-    expect(r.spots.map((s) => s.name)).toEqual(['E', 'F'])
+    expect(r.spots[0].name).toBe('E') // 最寄り
+    expect(r.spots.length).toBe(3)
   })
 })
 
